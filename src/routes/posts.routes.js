@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { likePost } from "../controllers/posts.controller.js";
+import { getPostsByHashtag, likePost } from "../controllers/posts.controller.js";
 
 const postsRouter = Router();
 
