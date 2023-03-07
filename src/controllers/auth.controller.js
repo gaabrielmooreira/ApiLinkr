@@ -1,23 +1,8 @@
 import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid'; 
-import { insertUser, selectEmail, startSession } from '../repositories/repositories.js';
+import { startSession } from '../repositories/auth.repositories.js';
+import { selectEmail } from '../repositories/users.repository.js';
 
-export async function signUp (req, res){
-    const {name, email, password, url} = req.body
-
-    try {
-       const emailExists = await selectEmail(email)
-       if(emailExists.rowCount !== 0) return res.status(409).send("Email already exists.")
-
-       const criptPassword = bcrypt.hashSync(password, 10)
-
-       insertUser(name, email, criptPassword, url)
-
-       res.sendStatus(201)
-    } catch (error) {
-        res.status(500).send(error.message)
-    }
-}
 
 export async function signIn (req, res){
     const { email, password} = req.body
