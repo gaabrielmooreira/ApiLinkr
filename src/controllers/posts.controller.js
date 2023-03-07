@@ -1,4 +1,4 @@
-import { deleteLikeInPost, getLike, insertLikeInPost } from "../repositories/posts.repository.js";
+import { deleteLikeInPost, getLike, getRepositoryPostsByHashtag, insertLikeInPost } from "../repositories/posts.repository.js";
 
 export async function likePost(req,res){
     const idPost = req.params.idPost;  
@@ -14,5 +14,17 @@ export async function likePost(req,res){
         }
     } catch(err) {
         return res.status(500).send(err);
+    }
+}
+
+
+export async function getPostsByHashtag(req,res) {
+    const {hashtag} = req.params
+    try {
+        const {rowCount, rows: data} = await getRepositoryPostsByHashtag(hashtag)
+        if (!rowCount) return res.sendStatus(404)
+        else return res.send(data)
+    } catch (error) {
+        return res.status(500).send(error.message)
     }
 }
