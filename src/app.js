@@ -3,13 +3,14 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import postsRouter from './routes/posts.routes.js';
 import authRouter from './routes/auth.routes.js';
+import userRouter from './routes/users.routes.js';
 dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use([authRouter,postsRouter]);
+app.use([authRouter,userRouter,postsRouter]);
 
 
 const PORT = process.env.PORT || 5000;
