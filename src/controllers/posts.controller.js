@@ -1,4 +1,17 @@
-import { deleteLikeInPost, getLike, insertLikeInPost } from "../repositories/posts.repository.js";
+import { deleteLikeInPost, getLike, insertLikeInPost, insertPost } from "../repositories/posts.repository.js";
+
+export async function createPost(req, res){
+
+    const data = req.body;    
+    try { 
+        insertPost(data);       
+        return res.status(201).send("post created");
+
+    } catch (error) {
+        return res.status(500).send(error.message);
+    }
+
+}
 
 export async function likePost(req,res){
     const idPost = req.params.idPost;  
