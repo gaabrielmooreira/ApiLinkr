@@ -1,5 +1,16 @@
-import { deleteLikePostInDb, deletePostInDb, getLikeFromDb, getPostFromDb, insertLikePostInDb, updatePostInDb, getRepositoryPostsByHashtag } from "../repositories/posts.repository.js";
+import { deleteLikePostInDb, deletePostInDb, getLikeFromDb, getPostFromDb, insertLikePostInDb, updatePostInDb, getRepositoryPostsByHashtag, insertPost } from "../repositories/posts.repository.js";
 
+export async function createPost(req, res){
+
+    const data = req.body;    
+    try { 
+        insertPost(data);       
+        return res.status(201).send("post created");
+
+    } catch (error) {
+        return res.status(500).send(error.message);
+    }
+}
 export async function likePost(req, res) {
     const idPost = req.params.idPost;
     const idUser = res.locals.idUser;
