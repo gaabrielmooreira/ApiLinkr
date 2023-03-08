@@ -1,4 +1,4 @@
-import { insertPost, deleteLikePostInDb, deletePostInDb, getLikeFromDb, insertLikePostInDb, updatePostInDb, getRepositoryPostsByHashtag, getPostById, getPostsFromDb } from "../repositories/posts.repository.js";
+import { insertPost, deleteLikePostInDb, deletePostInDb, getLikeFromDb, insertLikePostInDb, updatePostInDb, getRepositoryPostsByHashtag, getPostById, getPostsFromDb, getPostsByUser } from "../repositories/posts.repository.js";
 
 export async function createPost(req, res) {
 
@@ -79,5 +79,18 @@ export async function getPostsByHashtag(req, res) {
         else return res.send(data)
     } catch (error) {
         return res.status(500).send(error.message)
+    }
+}
+
+export async function getPostsFromUser(req, res) {
+    const { id } = req.params;
+
+    try {
+        const userPosts = await getPostsByUser(id)
+        if (!userPosts.rowCount) return res.status(404).send("No posts found")
+        return res.status(200).send(userPosts.rows)
+
+    } catch (err) {
+        return res.status(500).send(err.message);
     }
 }
