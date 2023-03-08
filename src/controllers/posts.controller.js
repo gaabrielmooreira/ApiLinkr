@@ -1,10 +1,13 @@
-import { deleteLikePostInDb, deletePostInDb, getLikeFromDb, insertLikePostInDb, updatePostInDb, getRepositoryPostsByHashtag, insertPost, getPostById, getPostsFromDb } from "../repositories/posts.repository.js";
+import { insertPost, deleteLikePostInDb, deletePostInDb, getLikeFromDb, insertLikePostInDb, updatePostInDb, getRepositoryPostsByHashtag, getPostById, getPostsFromDb } from "../repositories/posts.repository.js";
 
-export async function createPost(req, res){
+export async function createPost(req, res) {
 
-    const data = req.body;    
-    try { 
-        insertPost(data);       
+    const data = req.body;
+    const idUser = res.locals.user;
+     
+    
+    try {
+        insertPost(idUser, data);       
         return res.status(201).send("post created");
 
     } catch (error) {
@@ -12,12 +15,12 @@ export async function createPost(req, res){
     }
 }
 
-export async function getPosts(req,res){
+export async function getPosts(req, res) {
     const idUser = res.locals.user;
-    try{
+    try {
         const posts = getPostsFromDb(idUser);
         return res.send(posts.rows);
-    } catch (error){
+    } catch (error) {
         return res.status(500).send(error.message);
     }
 }
@@ -68,10 +71,10 @@ export async function updatePost(req, res) {
     }
 }
 
-export async function getPostsByHashtag(req,res) {
-    const {hashtag} = req.params
+export async function getPostsByHashtag(req, res) {
+    const { hashtag } = req.params
     try {
-        const {rowCount, rows: data} = await getRepositoryPostsByHashtag(hashtag)
+        const { rowCount, rows: data } = await getRepositoryPostsByHashtag(hashtag)
         if (!rowCount) return res.sendStatus(404)
         else return res.send(data)
     } catch (error) {

@@ -1,7 +1,8 @@
 import db from '../configs/database.config.js';
 
-export async function insertPost(data){
-    return await db.query(`INSERT INTO posts (id_user, post_description, post_link) VALUES ($1, $2, $3);`, [res.locals.user, data.description, data.link]);
+export async function insertPost(idUser, data){
+   
+    return await db.query(`INSERT INTO posts (post_link, post_description, user_id) VALUES ($1, $2, $3);`, [data.link, data.description, idUser]);
 }
 
 export async function getLikeFromDb(idUser, idPost) {
