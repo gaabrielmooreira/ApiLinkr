@@ -4,13 +4,13 @@ export default async function getTrendsInDB(){
     return await db.query(`
     SELECT hashtags.name
     FROM hashtags
-    RIGHT JOIN posts_hashtags
-    	ON hashtags.id = posts_hashtags."hashtagId"
-    RIGHT JOIN posts
-    	ON posts.id = posts_hashtags."postId"
-	WHERE posts."createdAt"::DATE > NOW()::DATE - 1
+    LEFT JOIN posts_hashtags
+    	ON hashtags.id = posts_hashtags.hashtag_id
+    LEFT JOIN posts
+    	ON posts.id = posts_hashtags.post_id
+	WHERE posts.created_at::DATE > NOW()::DATE - 1
 	GROUP BY hashtags.name
-    ORDER BY SUM(posts."visitCount") DESC
+    ORDER BY COUNT(posts.*) DESC
     LIMIT 10;
     `)
 }

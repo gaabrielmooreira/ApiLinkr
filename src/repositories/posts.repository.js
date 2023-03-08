@@ -43,23 +43,28 @@ export async function updatePostInDb(idPost, newText) {
 
 export async function getRepositoryPostsByHashtag(hashtag) {
     return await db.query(`
-        SELECT 
-            users.name,
-            users.url as "pictureUrl",
-            posts.description,
-            posts.url as link,
-            COUNT(likes.*) as 'likeCount'
-        FROM posts
-        JOIN users
-        ON users.id = posts."userId"
-        JOIN posts_hashtags
-        ON posts_hashtags."postId" = posts.id
-        JOIN hashtags
-        ON posts_hashtags."hashtagId" = hashtags.id
-        JOIN likes
-        ON likes."idPost" = posts.id
-        WHERE hashtags.name = $1
-        SORT BY post."createdAt" DESC
-        limit 20
+    SELECT 
+        posts.id as post_id,
+        users.name as user_name,
+        users.url,
+        posts.post_description as description,
+        posts.post_link as link,
+        (array_agg(u2.name))[1:2] AS liked_by,
+        COUNT(likes.id) as like_count
+    FROM posts
+    JOIN posts_hashtags
+        ON posts.id = posts_hashtags.post_id
+    JOIN hashtags
+        ON hashtags.id = posts_hashtags.hashtag_id
+    JOIN likes
+        ON likes.post_id = posts.id
+    JOIN users
+        ON users.id = posts.user_id
+    JOIN users u2
+        ON likes.user_id = u2.id  
+    WHERE hashtags.name = $1
+    GROUP BY posts.id, users.name, users.url
+    ORDER BY posts.created_at DESC
+    LIMIT 20
     `,[hashtag])
 }
