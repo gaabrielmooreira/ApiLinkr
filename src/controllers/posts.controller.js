@@ -87,8 +87,7 @@ export async function getPostsFromUser(req, res) {
 
     try {
         const userPosts = await getPostsByUser(id)
-        if (!userPosts.rowCount) return res.status(404).send("No posts found")
-        return res.status(200).send(userPosts.rows)
+        return res.status(201).send(userPosts.rows)
 
     } catch (err) {
         return res.status(500).send(err.message);
