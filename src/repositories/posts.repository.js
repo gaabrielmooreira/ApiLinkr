@@ -1,7 +1,7 @@
 import db from '../configs/database.config.js';
 
-export async function insertPost(idUser, data){
-   
+export async function insertPost(idUser, data) {
+
     return await db.query(`INSERT INTO posts (post_link, post_description, user_id) VALUES ($1, $2, $3);`, [data.link, data.description, idUser]);
 }
 
@@ -19,15 +19,33 @@ export async function deleteLikePostInDb(idUser, idPost) {
 
 export async function getPostsFromDb(idUser) {
     return await db.query(`
-        SELECT posts.*, COUNT(likes.id) AS likes_count, array_agg(users.name) AS liked_by, bool_or(likes.user_id = $1) AS user_liked
-        FROM posts
-        LEFT JOIN likes
+    SELECT 
+    posts.*,
+    u2.name AS post_author,
+    COUNT(likes.id) AS likes_count,
+    (
+        SELECT json_agg(json_build_object('id', id, 'name', name))
+        FROM (
+            SELECT users.id, users.name
+            FROM likes
+            JOIN users ON likes.user_id = users.id AND likes.user_id != $1
+            WHERE likes.post_id = posts.id
+            ORDER BY likes.created_at DESC
+            LIMIT 4
+        ) subquery
+    ) AS liked_by,
+    bool_or(likes.user_id = $1) AS user_liked
+    FROM posts
+    JOIN likes
         ON likes.post_id = posts.id
-        JOIN users
+    JOIN users
         ON users.id = likes.user_id
-        GROUP BY posts.id
-        ORDER BY created_at DESC;
-    `,[idUser])
+    JOIN users u2
+        ON u2.id = posts.user_id
+    GROUP BY posts.id, u2.id
+    ORDER BY created_at DESC
+    LIMIT 20;
+    `, [idUser])
 }
 
 export async function getPostById(idPost) {
@@ -67,5 +85,5 @@ export async function getRepositoryPostsByHashtag(hashtag) {
     GROUP BY posts.id, users.name, users.url
     ORDER BY posts.created_at DESC
     LIMIT 20
-    `,[hashtag])
+    `, [hashtag])
 }
