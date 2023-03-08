@@ -60,15 +60,16 @@ export async function updatePostInDb(idPost, newText) {
     await db.query(`UPDATE posts SET text = $1 WHERE "postId" = $2;`, [newText, idPost])
 }
 
-export async function getRepositoryPostsByHashtag(hashtag) {
+export async function getRepositoryPostsByHashtag(hashtag,idUser) {
     return await db.query(`
     SELECT 
         posts.id as post_id,
-        users.name as user_name,
-        users.url,
+        u1.name as user_name,
+        u1.url,
         posts.post_description as description,
         posts.post_link as link,
         (array_agg(u2.name))[1:2] AS liked_by,
+        bool_or(likes.user_id = $2) AS user_liked,
         COUNT(likes.id) as like_count
     FROM posts
     JOIN posts_hashtags
@@ -77,15 +78,15 @@ export async function getRepositoryPostsByHashtag(hashtag) {
         ON hashtags.id = posts_hashtags.hashtag_id
     JOIN likes
         ON likes.post_id = posts.id
-    JOIN users
-        ON users.id = posts.user_id
+    JOIN users u1
+        ON u1.id = posts.user_id
     JOIN users u2
-        ON likes.user_id = u2.id  
+        ON likes.user_id = u2.id 
     WHERE hashtags.name = $1
-    GROUP BY posts.id, users.name, users.url
+    GROUP BY posts.id, u1.name, u1.url
     ORDER BY posts.created_at DESC
     LIMIT 20
-    `, [hashtag])
+    `,[hashtag,idUser])
 }
 
 export async function getPostsByUser(id){
