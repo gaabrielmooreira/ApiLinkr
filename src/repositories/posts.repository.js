@@ -18,10 +18,12 @@ export async function deleteLikePostInDb(idUser, idPost) {
 
 export async function getPostsFromDb(idUser) {
     return await db.query(`
-        SELECT posts.*, COUNT(likes.id) AS likes_count, bool_or(likes.user_id = $1) AS user_liked
+        SELECT posts.*, COUNT(likes.id) AS likes_count, array_agg(users.name) AS liked_by, bool_or(likes.user_id = $1) AS user_liked
         FROM posts
         LEFT JOIN likes
         ON likes.post_id = posts.id
+        JOIN users
+        ON users.id = likes.user_id
         GROUP BY posts.id
         ORDER BY created_at DESC;
     `,[idUser])
