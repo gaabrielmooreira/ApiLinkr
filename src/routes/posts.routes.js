@@ -9,7 +9,7 @@ const postsRouter = Router();
 postsRouter.post("/create-post", schemaValidate(postSchema), authValidate, createPost);
 postsRouter.post("/posts/:idPost/like", authValidate, toggleLike);
 postsRouter.get("/posts", authValidate, getPosts)
-postsRouter.get("/hashtag/:hashtag", getPostsByHashtag);
+postsRouter.get("/hashtag/:hashtag", authValidate, getPostsByHashtag);
 postsRouter.put("/post/:idPost", authValidate, updatePost);
 postsRouter.delete("/posts/:idPost", authValidate, deletePost);
 
