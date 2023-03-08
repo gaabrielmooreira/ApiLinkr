@@ -3,24 +3,36 @@ import db from '../configs/database.config.js';
 export async function insertPost(data){
     return await db.query(`INSERT INTO posts (id_user, post_description, post_link) VALUES ($1, $2, $3);`, [res.locals.user, data.description, data.link]);
 }
+
 export async function getLikeFromDb(idUser, idPost) {
-    return await db.query(`SELECT * FROM likes WHERE "userId" = $1 AND "postId" = $2;`, [idUser, idPost]);
+    return await db.query(`SELECT * FROM likes WHERE user_id = $1 AND post_id = $2;`, [idUser, idPost]);
 }
 
 export async function insertLikePostInDb(idUser, idPost) {
-    await db.query(`INSERT INTO likes ("userId", "postId") VALUES ($1,$2);`, [idUser, idPost]);
+    await db.query(`INSERT INTO likes (user_id, post_id) VALUES ($1,$2);`, [idUser, idPost]);
 }
 
 export async function deleteLikePostInDb(idUser, idPost) {
-    await db.query(`DELETE FROM likes WHERE "userId" = $1 AND "postId" = $2;`, [idUser, idPost]);
+    await db.query(`DELETE FROM likes WHERE user_id = $1 AND post_id = $2;`, [idUser, idPost]);
 }
 
-export async function getPostFromDb(idPost) {
-    return await db.query(`SELECT * FROM posts WHERE "postId" = $1;`, [idPost]);
+export async function getPostsFromDb(idUser) {
+    return await db.query(`
+        SELECT posts.*, COUNT(likes.id) AS likes_count, bool_or(likes.user_id = $1) AS user_liked
+        FROM posts
+        LEFT JOIN likes
+        ON likes.post_id = posts.id
+        GROUP BY posts.id
+        ORDER BY created_at DESC;
+    `,[idUser])
+}
+
+export async function getPostById(idPost) {
+    return await db.query(`SELECT * FROM posts WHERE "id" = $1;`, [idPost]);
 }
 
 export async function deletePostInDb(idPost) {
-    await db.query(`DELETE FROM posts WHERE "postId" = $1;`, [idPost]);
+    await db.query(`DELETE FROM posts WHERE "id" = $1;`, [idPost]);
 }
 
 export async function updatePostInDb(idPost, newText) {
