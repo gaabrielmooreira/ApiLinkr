@@ -88,3 +88,11 @@ export async function getRepositoryPostsByHashtag(hashtag,idUser) {
     LIMIT 20
     `,[hashtag,idUser])
 }
+
+export async function getPostsByUser(id){
+    return await db.query(`
+        SELECT * FROM posts 
+        WHERE "user_id" = $1;`, 
+        [id]
+    )
+}
