@@ -12,7 +12,8 @@ export async function authValidate(req, res, next){
         if(!sessionExists.rowCount){
             return res.status(401).send("authentication error");
         }
-        res.locals.user =  sessionExists.rows[0].userId;
+        res.locals.user =  sessionExists.rows[0].user_id
+        
         next();
         
     } catch (error) {
