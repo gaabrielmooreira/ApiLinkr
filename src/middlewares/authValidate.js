@@ -8,11 +8,11 @@ export async function authValidate(req, res, next){
         return res.status(401).send("authentication error");
     }
     try {
-        const sessionExists = getSession(token);
+        const sessionExists = await getSession(token);
         if(!sessionExists.rowCount){
             return res.status(401).send("authentication error");
         }
-        res.locals.user = (await sessionExists).rows[0].userId;
+        res.locals.user =  sessionExists.rows[0].userId;
         next();
         
     } catch (error) {
