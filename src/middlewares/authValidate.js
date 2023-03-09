@@ -5,7 +5,7 @@ export async function authValidate(req, res, next){
     const authorization = req.headers.authorization;
     const token = authorization?.replace("Bearer ", "");
     if(!token){
-        return res.status(401).send("authentication error");
+        return res.status(401).send("missing token");
     }
     try {
         const sessionExists = await getSession(token);

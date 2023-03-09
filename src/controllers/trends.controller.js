@@ -7,6 +7,5 @@ export default async function getTrends(req,res) {
         else return res.send(trends)
     } catch (error) {
         return res.status(500).send(error.message);
-        
     }
 }
