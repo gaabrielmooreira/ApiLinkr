@@ -36,7 +36,7 @@ export async function getPostsFromDb(idUser) {
     u2.name AS post_author,
     u2.url AS photo_author,
     posts.post_description,
-    posts.post_link as link,
+    posts.post_link,
     (
         SELECT array_agg(name)
         FROM (
@@ -82,8 +82,18 @@ export async function getRepositoryPostsByHashtag(hashtag,idUser) {
         u1.name as post_author,
         u1.url as photo_author,
         posts.post_description,
-        posts.post_link as link,
-        (array_agg(u2.name))[1:2] AS liked_by,
+        posts.post_link,
+        (
+            SELECT array_agg(name)
+            FROM (
+                SELECT users.name
+                FROM likes
+                JOIN users ON likes.user_id = users.id AND likes.user_id != $2
+                WHERE likes.post_id = posts.id
+                ORDER BY likes.created_at DESC
+                LIMIT 2
+            ) subquery
+        ) AS liked_by,
         COALESCE(bool_or(likes.user_id = $2),false) AS user_liked,
         COUNT(likes.id) as like_count
     FROM posts
