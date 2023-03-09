@@ -32,30 +32,33 @@ export async function deleteLikePostInDb(idUser, idPost) {
 export async function getPostsFromDb(idUser) {
     return await db.query(`
     SELECT 
-    posts.*,
+    posts.id as id,
     u2.name AS post_author,
-    COUNT(likes.id) AS likes_count,
+    u2.url AS photo_author,
+    posts.post_description,
+    posts.post_link as link,
     (
-        SELECT json_agg(json_build_object('id', id, 'name', name))
+        SELECT array_agg(name)
         FROM (
-            SELECT users.id, users.name
+            SELECT users.name
             FROM likes
             JOIN users ON likes.user_id = users.id AND likes.user_id != $1
             WHERE likes.post_id = posts.id
             ORDER BY likes.created_at DESC
-            LIMIT 4
+            LIMIT 2
         ) subquery
     ) AS liked_by,
-    bool_or(likes.user_id = $1) AS user_liked
+    COALESCE(bool_or(likes.user_id = $1),false) AS user_liked,
+    COUNT(likes.id) AS likes_count
     FROM posts
-    JOIN likes
+    LEFT JOIN likes
         ON likes.post_id = posts.id
-    JOIN users
+    LEFT JOIN users
         ON users.id = likes.user_id
     JOIN users u2
         ON u2.id = posts.user_id
     GROUP BY posts.id, u2.id
-    ORDER BY created_at DESC
+    ORDER BY posts.created_at DESC
     LIMIT 20;
     `, [idUser])
 }
@@ -75,9 +78,9 @@ export async function updatePostInDb(idPost, postDescription) {
 export async function getRepositoryPostsByHashtag(hashtag,idUser) {
     return await db.query(`
     SELECT 
-        posts.id as post_id,
-        u1.name as user_name,
-        u1.url,
+        posts.id as id,
+        u1.name as post_author,
+        u1.url as photo_author,
         posts.post_description,
         posts.post_link as link,
         (array_agg(u2.name))[1:2] AS liked_by,
@@ -104,14 +107,24 @@ export async function getRepositoryPostsByHashtag(hashtag,idUser) {
 export async function getPostsByUser(idUser, id){
     return await db.query(`
     SELECT 
-        COUNT(likes.id) AS like_count,
-        posts.id AS post_id,
-        u1.name AS user_name,
-        u1.url,
+        posts.id AS id,
+        u1.name AS post_author,
+        u1.url AS photo_author,
         posts.post_description,
         posts.post_link,
-        (array_agg(u2.name))[1:2] AS liked_by,
-        bool_or(likes.user_id = $1) AS user_liked
+        (
+            SELECT array_agg(name)
+            FROM (
+                SELECT users.name
+                FROM likes
+                JOIN users ON likes.user_id = users.id AND likes.user_id != $1
+                WHERE likes.post_id = posts.id
+                ORDER BY likes.created_at DESC
+                LIMIT 2
+            ) subquery
+        ) AS liked_by,
+        COALESCE(bool_or(likes.user_id = $1),false) AS user_liked,
+        COUNT(likes.id) AS like_count
     FROM posts
     LEFT JOIN likes
         ON likes.post_id = posts.id
