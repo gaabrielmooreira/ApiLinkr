@@ -9,3 +9,7 @@ export async function startSession (token, id){
 export async function getSession(token){
     return await db.query(`SELECT * FROM sessions WHERE token = $1;`, [token]);
 }
+
+export async function deleteSession(id){
+    await db.query(`DELETE FROM sessions WHERE user_id = $1;`, [id])
+}
