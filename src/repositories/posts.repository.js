@@ -103,26 +103,25 @@ export async function getRepositoryPostsByHashtag(hashtag,idUser) {
 
 export async function getPostsByUser(idUser, id){
     return await db.query(`
-        SELECT
-            posts.id AS post_id,
-            u1.name AS user_name,
-            u1.url,
-            posts.post_description,
-            posts.post_link,
-            (array_agg(u2.name))[1:2] AS liked_by,
-            bool_or(likes.user_id = $1) AS user_liked,
-            COUNT(likes.id) AS like_count
-        FROM posts
-        LEFT JOIN likes 
-            ON likes.post_id = posts.id
-        LEFT JOIN users u1 
-            ON u1.id = posts.user_id
-        LEFT JOIN users u2
-            ON likes.user_id = u2.id
-        WHERE posts.user_id = $2
-        GROUP BY posts.id, u1.name, u1.url
-        ORDER BY posts.created_at DESC
-        LIMIT 20;
-        `, [id, idUser]
-    )
+    SELECT 
+        COUNT(likes.id) AS like_count,
+        posts.id AS post_id,
+        u1.name AS user_name,
+        u1.url,
+        posts.post_description,
+        posts.post_link,
+        (array_agg(u2.name))[1:2] AS liked_by,
+        bool_or(likes.user_id = $1) AS user_liked
+    FROM posts
+    LEFT JOIN likes
+        ON likes.post_id = posts.id
+    LEFT JOIN users u1
+        ON u1.id = posts.user_id
+    LEFT JOIN users u2
+        ON likes.user_id = u2.id
+    WHERE posts.user_id = $2
+    GROUP BY posts.id, u1.name, u1.url
+    ORDER BY posts.created_at DESC
+    LIMIT 20
+    `,[idUser, id])
 }

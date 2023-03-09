@@ -109,8 +109,8 @@ export async function getPostsFromUser(req, res) {
     const idUser = res.locals.user;
 
     try {
-        const userPosts = await getPostsByUser(id, idUser)
-        return res.status(201).send(userPosts.rows)
+        const userPosts = await getPostsByUser(idUser, id)
+        return res.status(201).send(userPosts.rows.json_build_object)
 
     } catch (err) {
         return res.status(500).send(err.message);
