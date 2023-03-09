@@ -33,6 +33,7 @@ export async function getPostsFromDb(idUser) {
     return await db.query(`
     SELECT 
     posts.id as id,
+    posts.user_id as post_author_id,
     u2.name AS post_author,
     u2.url AS photo_author,
     posts.post_description,
@@ -79,6 +80,7 @@ export async function getRepositoryPostsByHashtag(hashtag,idUser) {
     return await db.query(`
     SELECT 
         posts.id as id,
+        posts.user_id as post_author_id,
         u1.name as post_author,
         u1.url as photo_author,
         posts.post_description,
@@ -118,6 +120,7 @@ export async function getPostsByUser(idUser, id){
     return await db.query(`
     SELECT 
         posts.id AS id,
+        posts.user_id as post_author_id,
         u1.name AS post_author,
         u1.url AS photo_author,
         posts.post_description,
