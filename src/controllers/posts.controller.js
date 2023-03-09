@@ -1,7 +1,7 @@
 import { insertPost, deleteLikePostInDb, deletePostInDb, 
-getLikeFromDb, insertLikePostInDb, updatePostInDb, 
-getRepositoryPostsByHashtag, getPostById, getPostsFromDb,
-getHashtag, insertHashtag, insertHashPost} from "../repositories/posts.repository.js";
+    getLikeFromDb, insertLikePostInDb, updatePostInDb, 
+    getRepositoryPostsByHashtag, getPostById, getPostsFromDb, getPostsByUser,
+    getHashtag, insertHashtag, insertHashPost } from "../repositories/posts.repository.js";
 
 export async function createPost(req, res) {
 
@@ -94,11 +94,24 @@ export async function updatePost(req, res) {
 
 export async function getPostsByHashtag(req, res) {
     const { hashtag } = req.params
+    const idUser = res.locals.user;
     try {
-        const { rowCount, rows: data } = await getRepositoryPostsByHashtag(hashtag)
+        const { rowCount, rows: data } = await getRepositoryPostsByHashtag(hashtag,idUser)
         if (!rowCount) return res.sendStatus(404)
         else return res.send(data)
     } catch (error) {
         return res.status(500).send(error.message)
+    }
+}
+
+export async function getPostsFromUser(req, res) {
+    const { id } = req.params;
+
+    try {
+        const userPosts = await getPostsByUser(id)
+        return res.status(201).send(userPosts.rows)
+
+    } catch (err) {
+        return res.status(500).send(err.message);
     }
 }
