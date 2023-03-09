@@ -110,7 +110,7 @@ export async function getPostsFromUser(req, res) {
 
     try {
         const userPosts = await getPostsByUser(idUser, id)
-        return res.status(201).send(userPosts.rows.json_build_object)
+        return res.status(201).send(userPosts.rows)
 
     } catch (err) {
         return res.status(500).send(err.message);
