@@ -22,11 +22,11 @@ export async function getLikeFromDb(idUser, idPost) {
 }
 
 export async function insertLikePostInDb(idUser, idPost) {
-    await db.query(`INSERT INTO likes (user_id, post_id) VALUES ($1,$2);`, [idUser, idPost]);
+    return await db.query(`INSERT INTO likes (user_id, post_id) VALUES ($1,$2);`, [idUser, idPost]);
 }
 
 export async function deleteLikePostInDb(idUser, idPost) {
-    await db.query(`DELETE FROM likes WHERE user_id = $1 AND post_id = $2;`, [idUser, idPost]);
+    return await db.query(`DELETE FROM likes WHERE user_id = $1 AND post_id = $2;`, [idUser, idPost]);
 }
 
 export async function getPostsFromDb(idUser) {
@@ -69,7 +69,7 @@ export async function getPostById(idPost) {
 }
 
 export async function deletePostInDb(idPost) {
-    await db.query(`DELETE FROM posts WHERE "id" = $1;`, [idPost]);
+    return await db.query(`DELETE FROM posts WHERE "id" = $1;`, [idPost]);
 }
 
 export async function updatePostInDb(idPost, postDescription) {

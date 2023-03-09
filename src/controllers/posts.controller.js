@@ -54,7 +54,7 @@ export async function toggleLike(req, res) {
         const like = await getLikeFromDb(idUser, idPost);
         if (like.rowCount === 0) {
             await insertLikePostInDb(idUser, idPost);
-            return res.sendStatus(201).send("like created succesfully.");
+            return res.status(201).send("like created succesfully.");
         } else {
             await deleteLikePostInDb(idUser, idPost);
             return res.status(200).send("like deleted successfully.");
@@ -80,7 +80,7 @@ export async function deletePost(req, res) {
 
 export async function updatePost(req, res) {
     const idPost = req.params.idPost;
-    const idUser = req.locals.user;
+    const idUser = res.locals.user;
     const postDescription = req.body.postDescription;
     try {
         const post = await getPostById(idPost);
