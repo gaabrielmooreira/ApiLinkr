@@ -8,7 +8,6 @@ export async function createPost(req, res) {
     const data = req.body;
     const idUser = res.locals.user;
     const separator = data.description.split("#")
-    const postDescription = separator[0]; 
 
     const separatorHashtags = []
     for (let i = 1; i < separator.length; i++) {
@@ -16,7 +15,7 @@ export async function createPost(req, res) {
     }
 
     try {
-        const idPost = await insertPost(idUser, postDescription, data.link);
+        const idPost = await insertPost(idUser, data.description, data.link);
 
         for (let i = 0; i < separatorHashtags.length; i++) {
             const hashtagExists = await getHashtag(separatorHashtags[i]);
@@ -35,6 +34,8 @@ export async function createPost(req, res) {
         return res.status(500).send(error.message);
     }
 }
+
+
 
 export async function getPosts(req, res) {
     const idUser = res.locals.user;
@@ -93,7 +94,7 @@ export async function updatePost(req, res) {
 }
 
 export async function getPostsByHashtag(req, res) {
-    const { hashtag } = req.params
+    const { hashtag } = req.params;
     const idUser = res.locals.user;
     try {
         const { rowCount, rows: data } = await getRepositoryPostsByHashtag(hashtag,idUser)
