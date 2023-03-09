@@ -80,12 +80,12 @@ export async function deletePost(req, res) {
 export async function updatePost(req, res) {
     const idPost = req.params.idPost;
     const idUser = req.locals.user;
-    const newText = req.body.text;
+    const postDescription = req.body.postDescription;
     try {
         const post = await getPostById(idPost);
         if (post.rowCount === 0) return res.sendStatus(404);
         if (post.rows[0].user_id !== idUser) return res.status(401).send("you don't have permission for update this post.");
-        await updatePostInDb(idPost, newText);
+        await updatePostInDb(idPost, postDescription);
         return res.status(200).send("post updated successfully.")
     } catch (error) {
         return res.status(500).send(error.message);
