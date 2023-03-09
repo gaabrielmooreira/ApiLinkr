@@ -8,7 +8,6 @@ export async function createPost(req, res) {
     const data = req.body;
     const idUser = res.locals.user;
     const separator = data.description.split("#")
-    const postDescription = separator[0]; 
 
     const separatorHashtags = []
     for (let i = 1; i < separator.length; i++) {
@@ -16,7 +15,7 @@ export async function createPost(req, res) {
     }
 
     try {
-        const idPost = await insertPost(idUser, postDescription, data.link);
+        const idPost = await insertPost(idUser, data.description, data.link);
 
         for (let i = 0; i < separatorHashtags.length; i++) {
             const hashtagExists = await getHashtag(separatorHashtags[i]);
@@ -35,6 +34,8 @@ export async function createPost(req, res) {
         return res.status(500).send(error.message);
     }
 }
+
+
 
 export async function getPosts(req, res) {
     const idUser = res.locals.user;
@@ -80,12 +81,12 @@ export async function deletePost(req, res) {
 export async function updatePost(req, res) {
     const idPost = req.params.idPost;
     const idUser = req.locals.user;
-    const newText = req.body.text;
+    const postDescription = req.body.postDescription;
     try {
         const post = await getPostById(idPost);
         if (post.rowCount === 0) return res.sendStatus(404);
         if (post.rows[0].user_id !== idUser) return res.status(401).send("you don't have permission for update this post.");
-        await updatePostInDb(idPost, newText);
+        await updatePostInDb(idPost, postDescription);
         return res.status(200).send("post updated successfully.")
     } catch (error) {
         return res.status(500).send(error.message);
@@ -106,9 +107,10 @@ export async function getPostsByHashtag(req, res) {
 
 export async function getPostsFromUser(req, res) {
     const { id } = req.params;
+    const idUser = res.locals.user;
 
     try {
-        const userPosts = await getPostsByUser(id)
+        const userPosts = await getPostsByUser(idUser, id)
         return res.status(201).send(userPosts.rows)
 
     } catch (err) {
