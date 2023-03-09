@@ -80,7 +80,7 @@ export async function deletePost(req, res) {
 
 export async function updatePost(req, res) {
     const idPost = req.params.idPost;
-    const idUser = req.locals.user;
+    const idUser = res.locals.user;
     const postDescription = req.body.postDescription;
     try {
         const post = await getPostById(idPost);
