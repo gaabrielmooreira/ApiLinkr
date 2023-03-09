@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid'; 
 import { startSession } from '../repositories/auth.repositories.js';
-import { selectEmail } from '../repositories/users.repository.js';
+import {  selectEmail } from '../repositories/users.repository.js';
 
 
 export async function signIn (req, res){
@@ -13,12 +13,15 @@ export async function signIn (req, res){
 
         const findedPassword = findEmail.rows[0].password 
         const id = findEmail.rows[0].id 
+        const url = findEmail.rows[0].url
+        const name = findEmail.rows[0].name
 
         if (bcrypt.compareSync(password, findedPassword)){
 
             const token = uuid()
             startSession(token, id)
-            return res.status(200).send({token:token})
+            
+            return res.status(200).send({token:token, url: url, name:name})
 
         } else{
             return res.status(401).send("Email or password incorrect.")
