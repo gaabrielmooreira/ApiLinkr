@@ -54,7 +54,7 @@ export async function toggleLike(req, res) {
         const like = await getLikeFromDb(idUser, idPost);
         if (like.rowCount === 0) {
             await insertLikePostInDb(idUser, idPost);
-            return res.sendStatus(201).send("like created succesfully.");
+            return res.status(201).send("like created succesfully.");
         } else {
             await deleteLikePostInDb(idUser, idPost);
             return res.status(200).send("like deleted successfully.");
