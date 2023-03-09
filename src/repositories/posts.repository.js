@@ -68,8 +68,8 @@ export async function deletePostInDb(idPost) {
     await db.query(`DELETE FROM posts WHERE "id" = $1;`, [idPost]);
 }
 
-export async function updatePostInDb(idPost, newText) {
-    await db.query(`UPDATE posts SET text = $1 WHERE "postId" = $2;`, [newText, idPost])
+export async function updatePostInDb(idPost, postDescription) {
+    await db.query(`UPDATE posts SET post_description = $1 WHERE id = $2;`, [postDescription, idPost])
 }
 
 export async function getRepositoryPostsByHashtag(hashtag,idUser) {

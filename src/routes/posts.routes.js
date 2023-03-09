@@ -11,7 +11,7 @@ postsRouter.post("/posts/:idPost/like", authValidate, toggleLike);
 postsRouter.get("/posts", authValidate, getPosts)
 postsRouter.get("/hashtag/:hashtag", authValidate, getPostsByHashtag);
 postsRouter.get("/user/:id", authValidate, getPostsFromUser);
-postsRouter.put("/post/:idPost", authValidate, updatePost);
+postsRouter.put("/posts/:idPost", authValidate, updatePost);
 postsRouter.delete("/posts/:idPost", authValidate, deletePost);
 
 export default postsRouter;
