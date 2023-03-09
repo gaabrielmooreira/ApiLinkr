@@ -81,18 +81,18 @@ export async function getRepositoryPostsByHashtag(hashtag,idUser) {
         posts.post_description,
         posts.post_link as link,
         (array_agg(u2.name))[1:2] AS liked_by,
-        bool_or(likes.user_id = $2) AS user_liked,
+        COALESCE(bool_or(likes.user_id = $2),false) AS user_liked,
         COUNT(likes.id) as like_count
     FROM posts
     JOIN posts_hashtags
         ON posts.id = posts_hashtags.post_id
     JOIN hashtags
         ON hashtags.id = posts_hashtags.hashtag_id
-    JOIN likes
+    LEFT JOIN likes
         ON likes.post_id = posts.id
     JOIN users u1
         ON u1.id = posts.user_id
-    JOIN users u2
+    LEFT JOIN users u2
         ON likes.user_id = u2.id 
     WHERE hashtags.name = $1
     GROUP BY posts.id, u1.name, u1.url
