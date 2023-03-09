@@ -93,7 +93,7 @@ export async function updatePost(req, res) {
 }
 
 export async function getPostsByHashtag(req, res) {
-    const { hashtag } = req.params
+    const { hashtag } = req.params;
     const idUser = res.locals.user;
     try {
         const { rowCount, rows: data } = await getRepositoryPostsByHashtag(hashtag,idUser)
