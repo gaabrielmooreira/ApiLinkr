@@ -40,7 +40,7 @@ export async function createPost(req, res) {
 export async function getPosts(req, res) {
     const idUser = res.locals.user;
     try {
-        const posts = getPostsFromDb(idUser);
+        const posts = await getPostsFromDb(idUser);
         return res.send(posts.rows);
     } catch (error) {
         return res.status(500).send(error.message);
