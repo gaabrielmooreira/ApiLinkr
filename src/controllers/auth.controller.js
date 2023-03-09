@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid'; 
-import { startSession } from '../repositories/auth.repositories.js';
+import { deleteSession, startSession } from '../repositories/auth.repositories.js';
 import {  selectEmail } from '../repositories/users.repository.js';
 
 
@@ -33,3 +33,15 @@ export async function signIn (req, res){
     }
 }
 
+
+export async function signOut(req, res){
+    const id = res.locals.user
+
+    try {
+        deleteSession(id)
+        res.sendStatus(204)
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+
+}
