@@ -1,8 +1,20 @@
 import db from '../configs/database.config.js';
 
-export async function insertPost(idUser, data){
-   
-    return await db.query(`INSERT INTO posts (post_link, post_description, user_id) VALUES ($1, $2, $3);`, [data.link, data.description, idUser]);
+export async function insertPost(idUser, postDescription, link){
+  
+    return await db.query(`INSERT INTO posts (post_link, post_description, user_id) VALUES ($1, $2, $3) RETURNING id;`, [link, postDescription, idUser]);
+}
+
+export async function getHashtag(hashtag){
+    return await db.query(`SELECT * FROM hashtags WHERE name = $1;`, [hashtag]);
+}
+
+export async function insertHashPost(idPost, idHashtag){
+    return db.query(`INSERT INTO posts_hashtags (post_id, hashtag_id) VALUES ($1, $2);`, [idPost, idHashtag]);
+}
+
+export async function insertHashtag(hashtag){
+    return db.query(`INSERT INTO hashtags (name) VALUES ($1) RETURNING id;`, [hashtag]);
 }
 
 export async function getLikeFromDb(idUser, idPost) {

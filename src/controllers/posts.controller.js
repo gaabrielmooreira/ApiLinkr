@@ -1,13 +1,34 @@
-import { insertPost, deleteLikePostInDb, deletePostInDb, getLikeFromDb, insertLikePostInDb, updatePostInDb, getRepositoryPostsByHashtag, getPostById, getPostsFromDb } from "../repositories/posts.repository.js";
+import { insertPost, deleteLikePostInDb, deletePostInDb, 
+getLikeFromDb, insertLikePostInDb, updatePostInDb, 
+getRepositoryPostsByHashtag, getPostById, getPostsFromDb,
+getHashtag, insertHashtag, insertHashPost} from "../repositories/posts.repository.js";
 
 export async function createPost(req, res) {
 
     const data = req.body;
     const idUser = res.locals.user;
-     
-    
+    const separator = data.description.split("#")
+    const postDescription = separator[0]; 
+
+    const separatorHashtags = []
+    for (let i = 1; i < separator.length; i++) {
+        separatorHashtags.push(separator[i].replaceAll(" ", ""));
+    }
+
     try {
-        insertPost(idUser, data);       
+        const idPost = await insertPost(idUser, postDescription, data.link);
+
+        for (let i = 0; i < separatorHashtags.length; i++) {
+            const hashtagExists = await getHashtag(separatorHashtags[i]);
+            if (hashtagExists.rowCount) {
+                await insertHashPost(idPost.rows[0].id, hashtagExists.rows[0].id);
+            }
+            else{
+                const idHashtag = await insertHashtag(separatorHashtags[i]);
+                await insertHashPost(idPost.rows[0].id, idHashtag.rows[0].id);
+            }
+        }
+
         return res.status(201).send("post created");
 
     } catch (error) {
