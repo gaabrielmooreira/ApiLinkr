@@ -108,7 +108,7 @@ export async function getRepositoryPostsByHashtag(hashtag,idUser) {
             ) subquery
         ) AS liked_by,
         COALESCE(bool_or(likes.user_id = $2),false) AS user_liked,
-        COUNT(likes.id) as like_count
+        COUNT(likes.id) as likes_count
     FROM posts
     JOIN posts_hashtags
         ON posts.id = posts_hashtags.post_id
@@ -151,7 +151,7 @@ export async function getPostsByUser(idUser, id){
             ) subquery
         ) AS liked_by,
         COALESCE(bool_or(likes.user_id = $1),false) AS user_liked,
-        COUNT(likes.id) AS like_count
+        COUNT(likes.id) AS likes_count
     FROM posts
     LEFT JOIN likes
         ON likes.post_id = posts.id
