@@ -1,8 +1,10 @@
 import urlMetadata from 'url-metadata';
-import { insertPost, deleteLikePostInDb, deletePostInDb, 
-    getLikeFromDb, insertLikePostInDb, updatePostInDb, 
+import {
+    insertPost, deleteLikePostInDb, deletePostInDb,
+    getLikeFromDb, insertLikePostInDb, updatePostInDb,
     getRepositoryPostsByHashtag, getPostById, getPostsFromDb, getPostsByUser,
-    getHashtag, insertHashtag, insertHashPost } from "../repositories/posts.repository.js";
+    getHashtag, insertHashtag, insertHashPost
+} from "../repositories/posts.repository.js";
 
 export async function createPost(req, res) {
 
@@ -17,14 +19,16 @@ export async function createPost(req, res) {
 
     try {
         const metadata = await urlMetadata(data.link);
-        const idPost = await insertPost(idUser, data.description, metadata);
+        const { title: post_link_title, image: post_link_image, description: post_link_description } = metadata;
+
+        const idPost = await insertPost(idUser, data.description, data.link, post_link_title, post_link_description, post_link_image);
 
         for (let i = 0; i < separatorHashtags.length; i++) {
             const hashtagExists = await getHashtag(separatorHashtags[i]);
             if (hashtagExists.rowCount) {
                 await insertHashPost(idPost.rows[0].id, hashtagExists.rows[0].id);
             }
-            else{
+            else {
                 const idHashtag = await insertHashtag(separatorHashtags[i]);
                 await insertHashPost(idPost.rows[0].id, idHashtag.rows[0].id);
             }
@@ -104,7 +108,7 @@ export async function updatePost(req, res) {
             if (hashtagExists.rowCount) {
                 await insertHashPost(post.rows[0].id, hashtagExists.rows[0].id);
             }
-            else{
+            else {
                 const idHashtag = await insertHashtag(separatorHashtags[i]);
                 await insertHashPost(post.rows[0].id, idHashtag.rows[0].id);
             }
@@ -120,7 +124,7 @@ export async function getPostsByHashtag(req, res) {
     const { hashtag } = req.params;
     const idUser = res.locals.user;
     try {
-        const { rowCount, rows: data } = await getRepositoryPostsByHashtag(hashtag,idUser)
+        const { rowCount, rows: data } = await getRepositoryPostsByHashtag(hashtag, idUser)
         if (!rowCount) return res.sendStatus(404)
         else return res.send(data)
     } catch (error) {

@@ -1,8 +1,13 @@
 import db from '../configs/database.config.js';
 
-export async function insertPost(idUser, postDescription, link){
+export async function insertPost(idUser, postDescription, post_link, post_link_title, post_link_description, post_link_image){
   
-    return await db.query(`INSERT INTO posts (post_link, post_description, user_id) VALUES ($1, $2, $3) RETURNING id;`, [link, postDescription, idUser]);
+    return await db.query(`
+    INSERT INTO posts 
+    (post_link, post_description, user_id, post_link_title, post_link_description, post_link_image) 
+    VALUES ($1, $2, $3, $4, $5, $6) 
+    RETURNING id;
+    `, [post_link, postDescription, idUser, post_link_title, post_link_description, post_link_image]);
 }
 
 export async function getHashtag(hashtag){
@@ -38,6 +43,9 @@ export async function getPostsFromDb(idUser) {
     u2.url AS photo_author,
     posts.post_description,
     posts.post_link,
+    posts.post_link_title,
+    posts.post_link_description,
+    posts.post_link_image,
     (
         SELECT array_agg(name)
         FROM (
@@ -85,6 +93,9 @@ export async function getRepositoryPostsByHashtag(hashtag,idUser) {
         u1.url as photo_author,
         posts.post_description,
         posts.post_link,
+        posts.post_link_title,
+        posts.post_link_description,
+        posts.post_link_image,
         (
             SELECT array_agg(name)
             FROM (
@@ -125,6 +136,9 @@ export async function getPostsByUser(idUser, id){
         u1.url AS photo_author,
         posts.post_description,
         posts.post_link,
+        posts.post_link_title,
+        posts.post_link_description,
+        posts.post_link_image,
         (
             SELECT array_agg(name)
             FROM (
