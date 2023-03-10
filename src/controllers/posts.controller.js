@@ -16,10 +16,14 @@ export async function createPost(req, res) {
     for (let i = 0; i < separator.length; i++) {
         if (separator[i][0] === '#') separatorHashtags.push(separator[i].slice(1).trim());
     }
-
-
+    let metadata
     try {
-        const metadata = await urlMetadata(data.link);
+        metadata = await urlMetadata(data.link);
+    } catch (error) {
+        metadata = await urlMetadata("https://www.google.com")
+    }
+    try {
+        
         const { title: post_link_title, image: post_link_image, description: post_link_description } = metadata;
 
         const idPost = await insertPost(idUser, data.description, data.link, post_link_title, post_link_description, post_link_image);
