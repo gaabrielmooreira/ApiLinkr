@@ -22,6 +22,17 @@ export async function insertHashtag(hashtag){
     return db.query(`INSERT INTO hashtags (name) VALUES ($1) RETURNING id;`, [hashtag]);
 }
 
+export async function deleteHashtag(idPost, hashtag){
+    return db.query(`
+    DELETE FROM posts_hashtags 
+    WHERE id = (SELECT p.id 
+        FROM posts_hashtags p 
+        JOIN hashtags h 
+        ON h.id = p.hashtag_id 
+        WHERE post_id = $1 AND h.name = $2
+        );`, [idPost, hashtag]);
+}
+
 export async function getLikeFromDb(idUser, idPost) {
     return await db.query(`SELECT * FROM likes WHERE user_id = $1 AND post_id = $2;`, [idUser, idPost]);
 }
