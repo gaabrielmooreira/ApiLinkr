@@ -3,19 +3,20 @@ import {
     insertPost, deleteLikePostInDb, deletePostInDb,
     getLikeFromDb, insertLikePostInDb, updatePostInDb,
     getRepositoryPostsByHashtag, getPostById, getPostsFromDb, getPostsByUser,
-    getHashtag, insertHashtag, insertHashPost
+    getHashtag, insertHashtag, insertHashPost, deleteHashtag
 } from "../repositories/posts.repository.js";
 
 export async function createPost(req, res) {
 
     const data = req.body;
     const idUser = res.locals.user;
-    const separator = data.description.split("#")
+    const separator = data.description.split(" ")
 
     const separatorHashtags = []
-    for (let i = 1; i < separator.length; i++) {
-        separatorHashtags.push(separator[i].replaceAll(" ", ""));
+    for (let i = 0; i < separator.length; i++) {
+        if (separator[i][0] === '#') separatorHashtags.push(separator[i].slice(1).trim());
     }
+
 
     try {
         const metadata = await urlMetadata(data.link);
@@ -88,18 +89,30 @@ export async function updatePost(req, res) {
     const idPost = req.params.idPost;
     const idUser = res.locals.user;
     const postDescription = req.body.postDescription;
-    const separator = postDescription.split("#");
-
-    const separatorHashtags = [];
-
-    for (let i = 1; i < separator.length; i++) {
-        separatorHashtags.push(separator[i].replaceAll(" ", ""));
-    }
 
     try {
         const post = await getPostById(idPost);
         if (post.rowCount === 0) return res.sendStatus(404);
         if (post.rows[0].user_id !== idUser) return res.status(401).send("you don't have permission for update this post.");
+
+        const separator = postDescription.split(" ");
+        const separatorHashtags = [];
+        const oldHashtags = [];
+
+        for (let i = 0; i < separator.length; i++) {
+            if (separator[i][0] === '#') separatorHashtags.push(separator[i].slice(1).trim());
+        }
+
+        const getOldHashtags = () => post.rows[0].post_description.split(" ").forEach(e => {
+            if (e[0] === '#') {
+                oldHashtags.push(e.slice(1));
+            }
+        });
+        getOldHashtags();
+
+        for (let i = 0; i < oldHashtags.length; i++) {
+            await deleteHashtag(idPost, oldHashtags[i]);
+        }
 
         await updatePostInDb(idPost, postDescription);
 
