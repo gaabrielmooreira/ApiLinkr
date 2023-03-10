@@ -1,3 +1,4 @@
+import urlMetadata from 'url-metadata';
 import { insertPost, deleteLikePostInDb, deletePostInDb, 
     getLikeFromDb, insertLikePostInDb, updatePostInDb, 
     getRepositoryPostsByHashtag, getPostById, getPostsFromDb, getPostsByUser,
@@ -15,7 +16,8 @@ export async function createPost(req, res) {
     }
 
     try {
-        const idPost = await insertPost(idUser, data.description, data.link);
+        const metadata = await urlMetadata(data.link);
+        const idPost = await insertPost(idUser, data.description, metadata);
 
         for (let i = 0; i < separatorHashtags.length; i++) {
             const hashtagExists = await getHashtag(separatorHashtags[i]);
@@ -82,11 +84,32 @@ export async function updatePost(req, res) {
     const idPost = req.params.idPost;
     const idUser = res.locals.user;
     const postDescription = req.body.postDescription;
+    const separator = postDescription.split("#");
+
+    const separatorHashtags = [];
+
+    for (let i = 1; i < separator.length; i++) {
+        separatorHashtags.push(separator[i].replaceAll(" ", ""));
+    }
+
     try {
         const post = await getPostById(idPost);
         if (post.rowCount === 0) return res.sendStatus(404);
         if (post.rows[0].user_id !== idUser) return res.status(401).send("you don't have permission for update this post.");
+
         await updatePostInDb(idPost, postDescription);
+
+        for (let i = 0; i < separatorHashtags.length; i++) {
+            const hashtagExists = await getHashtag(separatorHashtags[i]);
+            if (hashtagExists.rowCount) {
+                await insertHashPost(post.rows[0].id, hashtagExists.rows[0].id);
+            }
+            else{
+                const idHashtag = await insertHashtag(separatorHashtags[i]);
+                await insertHashPost(post.rows[0].id, idHashtag.rows[0].id);
+            }
+        }
+
         return res.status(200).send("post updated successfully.")
     } catch (error) {
         return res.status(500).send(error.message);
