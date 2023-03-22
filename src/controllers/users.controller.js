@@ -20,8 +20,10 @@ export async function signUp(req, res) {
 
 export async function searchUser(req, res) {
     const { string } = req.params
+    const idUser = res.locals.user;
+
     try {
-        const { rows: listUsers } = await searchUserInDB(string)
+        const listUsers = await searchUserInDB(string,idUser)
         return res.send(listUsers)
     } catch (error) {
         res.status(500).send(error.message)

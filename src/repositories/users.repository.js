@@ -10,9 +10,19 @@ export async function insertUser (name, email, password, url){
 }
 
 
-export async function searchUserInDB(string) {
-    return await db.query(`
-    SELECT users.id,users.name, users.url AS photo_user from users
-    WHERE LOWER(name) LIKE '%' || LOWER($1) || '%';
-    `,[string])
+export async function searchUserInDB(string,idUser) {
+    const { rows: listUsers } = await db.query(`
+    SELECT
+        USERS.ID,
+	    USERS.NAME,
+	    USERS.URL AS PHOTO_USER,
+	    bool_or(follows.follower_user_id = $2) as IS_FOLLOWING
+    FROM USERS
+    JOIN follows
+        ON follows.followed_user_id = USERS.ID
+    WHERE LOWER(NAME) LIKE '%' || LOWER($1) || '%'
+    GROUP BY USERS.ID
+    ORDER BY IS_FOLLOWING DESC
+    `,[string,idUser])
+    return listUsers
 }
