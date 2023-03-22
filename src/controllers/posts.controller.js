@@ -3,7 +3,7 @@ import {
     insertPost, deleteLikePostInDb, deletePostInDb,
     getLikeFromDb, insertLikePostInDb, updatePostInDb,
     getRepositoryPostsByHashtag, getPostById, getPostsFromDb, getPostsByUser,
-    getHashtag, insertHashtag, insertHashPost, deleteHashtag
+    getHashtag, insertHashtag, insertHashPost, deleteHashtag, getPostsAfterDate
 } from "../repositories/posts.repository.js";
 
 export async function createPost(req, res) {
@@ -157,6 +157,18 @@ export async function getPostsFromUser(req, res) {
         const userPosts = await getPostsByUser(idUser, id)
         return res.status(201).send(userPosts.rows)
 
+    } catch (err) {
+        return res.status(500).send(err.message);
+    }
+}
+
+export async function getNewPosts(req, res){
+    const dateParam = Number(req.params.dateParam) / 1000;
+    const idUser = res.locals.user;
+
+    try{
+        const posts = await getPostsAfterDate(idUser, dateParam);
+        return res.send(posts.rows);
     } catch (err) {
         return res.status(500).send(err.message);
     }
