@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { insertUser, searchUserInDB, selectEmail } from '../repositories/users.repository.js';
+import { insertUser, searchUserByIdInDB, searchUserByStringInDB, selectEmail } from '../repositories/users.repository.js';
 
 export async function signUp(req, res) {
     const { name, email, password, url } = req.body
@@ -18,13 +18,25 @@ export async function signUp(req, res) {
     }
 }
 
-export async function searchUser(req, res) {
+export async function searchUserByString(req, res) {
     const { string } = req.params
     const idUser = res.locals.user;
 
     try {
-        const listUsers = await searchUserInDB(string,idUser)
+        const listUsers = await searchUserByStringInDB(string,idUser)
         return res.send(listUsers)
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+}
+
+export async function searchUserByID(req, res) {
+    const { idUserSearched } = req.params
+    const idUser = res.locals.user;
+
+    try {
+        const user = await searchUserByIdInDB(idUser,idUserSearched)
+        return res.send(user)
     } catch (error) {
         res.status(500).send(error.message)
     }
