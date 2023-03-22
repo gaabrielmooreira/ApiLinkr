@@ -1,3 +1,4 @@
+import { query } from 'express';
 import db from '../configs/database.config.js';
 
 export async function insertPost(idUser, postDescription, post_link, post_link_title, post_link_description, post_link_image){
@@ -178,6 +179,14 @@ export async function getPostsByUser(idUser, id){
     `,[idUser, id])
 }
 
+
+export async function insertRePost(idPost,idUser ){
+    return await db.query(`INSERT INTO re_posts (post_id, user_id) VALUES ($1, $2);`, [idPost, idUser])
+}
+
+export async function getRePostCountFromDb(idPost){
+    return await db.query(`SELECT COUNT(post_id) FROM re_posts WHERE post_id = $1;`, [idPost])
+}
 export async function getPostsAfterDate(idUser, date){
     return await db.query(`
     SELECT 
@@ -215,4 +224,5 @@ export async function getPostsAfterDate(idUser, date){
     GROUP BY posts.id, u2.id
     ORDER BY posts.created_at DESC
     `,[idUser, date])
+
 }
