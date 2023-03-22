@@ -164,7 +164,7 @@ export async function getPostsFromUser(req, res) {
 
 
 export async function createRePost(req, res){
-    const idPost = req.body.id
+    const idPost = req.body.idPost;
     const idUser = res.locals.user;
 
     try {
