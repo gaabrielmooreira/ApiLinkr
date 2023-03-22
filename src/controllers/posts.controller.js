@@ -3,7 +3,7 @@ import {
     insertPost, deleteLikePostInDb, deletePostInDb,
     getLikeFromDb, insertLikePostInDb, updatePostInDb,
     getRepositoryPostsByHashtag, getPostById, getPostsFromDb, getPostsByUser,
-    getHashtag, insertHashtag, insertHashPost, deleteHashtag, insertRePost, getRePostCountFromDb
+    getHashtag, insertHashtag, insertHashPost, deleteHashtag, getPostsAfterDate, insertRePost, getRePostCountFromDb
 } from "../repositories/posts.repository.js";
 
 export async function createPost(req, res) {
@@ -162,6 +162,7 @@ export async function getPostsFromUser(req, res) {
     }
 }
 
+
 export async function createRePost(req, res){
     const idPost = req.body.id
     const idUser = res.locals.user;
@@ -184,3 +185,16 @@ export async function getRePostCount(req, res){
         res.status(500).send(error.message)
     }
 }
+
+export async function getNewPosts(req, res){
+    const dateParam = Number(req.params.dateParam) / 1000;
+    const idUser = res.locals.user;
+
+    try{
+        const posts = await getPostsAfterDate(idUser, dateParam);
+        return res.send(posts.rows);
+    } catch (err) {
+        return res.status(500).send(err.message);
+    }
+}
+
