@@ -1,3 +1,4 @@
+import { query } from 'express';
 import db from '../configs/database.config.js';
 
 export async function insertPost(idUser, postDescription, post_link, post_link_title, post_link_description, post_link_image){
@@ -57,6 +58,7 @@ export async function getPostsFromDb(idUser) {
     posts.post_link_title,
     posts.post_link_description,
     posts.post_link_image,
+    posts.created_at,
     (
         SELECT array_agg(name)
         FROM (
@@ -175,4 +177,52 @@ export async function getPostsByUser(idUser, id){
     ORDER BY posts.created_at DESC
     LIMIT 20
     `,[idUser, id])
+}
+
+
+export async function insertRePost(idPost,idUser ){
+    return await db.query(`INSERT INTO re_posts (post_id, user_id) VALUES ($1, $2);`, [idPost, idUser])
+}
+
+export async function getRePostCountFromDb(idPost){
+    return await db.query(`SELECT COUNT(post_id) FROM re_posts WHERE post_id = $1;`, [idPost])
+}
+export async function getPostsAfterDate(idUser, date){
+    return await db.query(`
+    SELECT 
+    posts.id as id,
+    posts.user_id as post_author_id,
+    u2.name AS post_author,
+    u2.url AS photo_author,
+    posts.post_description,
+    posts.post_link,
+    posts.post_link_title,
+    posts.post_link_description,
+    posts.post_link_image,
+    posts.created_at,
+    (
+        SELECT array_agg(name)
+        FROM (
+            SELECT users.name
+            FROM likes
+            JOIN users ON likes.user_id = users.id AND likes.user_id != $1
+            WHERE likes.post_id = posts.id
+            ORDER BY likes.created_at DESC
+            LIMIT 2
+        ) subquery
+    ) AS liked_by,
+    COALESCE(bool_or(likes.user_id = $1),false) AS user_liked,
+    COUNT(likes.id) AS likes_count
+    FROM posts
+    LEFT JOIN likes
+        ON likes.post_id = posts.id
+    LEFT JOIN users
+        ON users.id = likes.user_id
+    JOIN users u2
+        ON u2.id = posts.user_id
+    WHERE posts.created_at > to_timestamp($2) AND posts.user_id != $1
+    GROUP BY posts.id, u2.id
+    ORDER BY posts.created_at DESC
+    `,[idUser, date])
+
 }
