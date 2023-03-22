@@ -1,4 +1,4 @@
-import { addFollowDB , deleteFollowDB, checkIfFollowedDB} from "../repositories/follows.repositories.js";
+import { addFollowDB , deleteFollowDB, checkIfFollowedDB, followAtLeastOne} from "../repositories/follows.repositories.js";
 
 export  async function addFollow(req,res) {
     const follower_user_id = res.locals.user;
@@ -34,4 +34,14 @@ export  async function checkIfFollowed(req,res) {
         return res.status(500).send(error.message);
     }
 
+}
+
+export  async function checkIfFollowAtLeastOne(_,res) {
+    const follower_user_id = res.locals.user;
+    try {
+        const check = await followAtLeastOne(follower_user_id);
+        res.send(check);
+    } catch (error) {
+        return res.status(500).send(error.message);
+    }
 }

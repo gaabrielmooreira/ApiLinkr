@@ -79,7 +79,10 @@ export async function getPostsFromDb(idUser) {
         ON users.id = likes.user_id
     JOIN users u2
         ON u2.id = posts.user_id
-    GROUP BY posts.id, u2.id
+    JOIN follows 
+        ON follows.follower_user_id = $1
+	WHERE follows.followed_user_id = posts.user_id OR posts.user_id = $1
+    GROUP BY posts.id, u2.id, follows.follower_user_id
     ORDER BY posts.created_at DESC
     LIMIT 20;
     `, [idUser])
@@ -220,9 +223,10 @@ export async function getPostsAfterDate(idUser, date){
         ON users.id = likes.user_id
     JOIN users u2
         ON u2.id = posts.user_id
-    WHERE posts.created_at > to_timestamp($2) AND posts.user_id != $1
+    JOIN follows 
+        ON follows.follower_user_id = $1
+    WHERE posts.created_at > to_timestamp($2) AND posts.user_id != $1 AND follows.followed_user_id = posts.user_id
     GROUP BY posts.id, u2.id
     ORDER BY posts.created_at DESC
     `,[idUser, date])
-
 }
