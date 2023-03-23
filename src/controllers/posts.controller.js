@@ -3,7 +3,8 @@ import {
     insertPost, deleteLikePostInDb, deletePostInDb,
     getLikeFromDb, insertLikePostInDb, updatePostInDb,
     getRepositoryPostsByHashtag, getPostById, getPostsFromDb, getPostsByUser,
-    getHashtag, insertHashtag, insertHashPost, deleteHashtag, getPostsAfterDate, insertRePost, getRePostCountFromDb, getRePostsFromDb
+    getHashtag, insertHashtag, insertHashPost, deleteHashtag,  
+    insertRePost, getRePostCountFromDb, getRePostsAndPostsFromDb, getRePostsAndPostsAfterDateFromDb
 } from "../repositories/posts.repository.js";
 
 export async function createPost(req, res) {
@@ -186,35 +187,55 @@ export async function getRePostCount(req, res){
     }
 }
 
-export async function getNewPosts(req, res){
+// export async function getNewPosts(req, res){
+//     const dateParam = Number(req.params.dateParam) / 1000;
+//     const idUser = res.locals.user;
+
+//     try{
+//         const posts = await getPostsAfterDate(idUser, dateParam);
+//         return res.send(posts.rows);
+//     } catch (err) {
+//         return res.status(500).send(err.message);
+//     }
+// }
+
+
+// export async function getPostAndRePost(req, res){
+//     const idUser = res.locals.user;
+
+//     try {
+//         const posts = await getPostsFromDb(idUser);
+//         const rePosts = await getRePostsFromDb(idUser)
+
+//         const combinate = [...posts.rows, ...rePosts.rows]
+//         combinate.sort((a,b)=> b.created_at - a.created_at)
+
+//         res.send(combinate)
+        
+//     } catch (error) {
+//         res.status(500).send(error.message)
+//     }
+// }
+
+export async function getRePostsAndPosts(req,res){
+    const idUser = res.locals.user;
+    try{
+        const rePostsAndPosts = await getRePostsAndPostsFromDb(idUser);
+        
+        res.send(rePostsAndPosts.rows);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+}
+
+export async function getNewRePostsAndPosts(req, res){
     const dateParam = Number(req.params.dateParam) / 1000;
     const idUser = res.locals.user;
 
     try{
-        const posts = await getPostsAfterDate(idUser, dateParam);
+        const posts = await getRePostsAndPostsAfterDateFromDb(idUser, dateParam);
         return res.send(posts.rows);
     } catch (err) {
         return res.status(500).send(err.message);
     }
 }
-
-
-export async function getPostAndRePost(req, res){
-    const idUser = res.locals.user;
-
-    try {
-        const posts = await getPostsFromDb(idUser);
-        const rePosts = await getRePostsFromDb(idUser)
-
-        const combinate = [...posts.rows, ...rePosts.rows]
-        combinate.sort((a,b)=> b.created_at - a.created_at)
-
-        res.send(combinate)
-        
-    } catch (error) {
-        res.status(500).send(error.message)
-    }
-
-}
-
-
