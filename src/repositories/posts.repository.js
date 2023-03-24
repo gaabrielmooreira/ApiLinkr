@@ -276,7 +276,7 @@ export async function getRePostsAndPostsAfterDateFromDb(idUser, date) {
             ON users.id = likes.user_id
         JOIN users u2
             ON u2.id = posts.user_id
-        JOIN follows 
+        LEFT JOIN follows 
             ON follows.followed_user_id = posts.user_id
         WHERE posts.created_at > to_timestamp($2) AND posts.user_id != $1 AND follows.follower_user_id = $1
         GROUP BY posts.id, u2.id, follows.follower_user_id
@@ -318,7 +318,7 @@ export async function getRePostsAndPostsAfterDateFromDb(idUser, date) {
             ON u2.id = posts.user_id
         JOIN users u3 
             ON u3.id = re_posts.user_id
-        JOIN follows
+        LEFT JOIN follows
             ON follows.followed_user_id = re_posts.user_id
         WHERE re_posts.created_at > to_timestamp($2) AND re_posts.user_id != $1 AND follows.follower_user_id = $1
         GROUP BY re_posts.id, posts.id, u2.id,u3.id, follows.follower_user_id
@@ -363,7 +363,7 @@ export async function getRePostsAndPostsFromDb(idUser) {
             ON users.id = likes.user_id
         JOIN users u2
             ON u2.id = posts.user_id
-        JOIN follows 
+        LEFT JOIN follows 
             ON follows.followed_user_id = posts.user_id
         WHERE follows.follower_user_id = $1 OR posts.user_id = $1
         GROUP BY posts.id, u2.id, follows.follower_user_id
@@ -405,7 +405,7 @@ export async function getRePostsAndPostsFromDb(idUser) {
             ON u2.id = posts.user_id
         JOIN users u3 
             ON u3.id = re_posts.user_id
-        JOIN follows 
+        LEFT JOIN follows 
             ON follows.followed_user_id = re_posts.user_id
         WHERE follows.follower_user_id = $1 OR re_posts.user_id = $1
         GROUP BY re_posts.id, posts.id, u2.id,u3.id, follows.follower_user_id
