@@ -2,7 +2,7 @@ import urlMetadata from 'url-metadata';
 import {
     insertPost, deleteLikePostInDb, deletePostInDb,
     getLikeFromDb, insertLikePostInDb, updatePostInDb,
-    getRepositoryPostsByHashtag, getPostById, getPostsFromDb, getPostsByUser,
+    getRepositoryPostsByHashtag, getPostById, getPostsByUser,
     getHashtag, insertHashtag, insertHashPost, deleteHashtag,  
     insertRePost, getRePostCountFromDb, getRePostsAndPostsFromDb, getRePostsAndPostsAfterDateFromDb
 } from "../repositories/posts.repository.js";
@@ -42,16 +42,6 @@ export async function createPost(req, res) {
 
         return res.status(201).send("post created");
 
-    } catch (error) {
-        return res.status(500).send(error.message);
-    }
-}
-
-export async function getPosts(req, res) {
-    const idUser = res.locals.user;
-    try {
-        const posts = await getPostsFromDb(idUser);
-        return res.send(posts.rows);
     } catch (error) {
         return res.status(500).send(error.message);
     }
