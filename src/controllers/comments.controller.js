@@ -5,8 +5,9 @@ export async function createComment(req, res){
     const idUser = res.locals.user;
     
     try {
-        const {rows:new_id} = await insertComment(idPost, idUser, comment);
-        return res.status(201).send(new_id[0]);
+        const newId = await insertComment(idPost, idUser, comment);
+        console.log(newId);
+        return res.status(201).send(newId);
 
     } catch (error) {
         return res.status(500).send(error.message);
