@@ -1,4 +1,3 @@
-import { query } from 'express';
 import db from '../configs/database.config.js';
 
 export async function insertPost(idUser, postDescription, post_link, post_link_title, post_link_description, post_link_image) {
