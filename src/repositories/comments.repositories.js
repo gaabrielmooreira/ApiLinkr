@@ -1,7 +1,8 @@
 import db from "../configs/database.config.js";
 
 export async function insertComment(post, user, text) {
-    return await db.query(`INSERT INTO comments (post_id, user_id, comment_text) VALUES ($1, $2, $3) RETURNING id;`, [post, user, text]);
+    const {rows} = await db.query(`INSERT INTO comments (post_id, user_id, comment_text) VALUES ($1, $2, $3) RETURNING id;`, [post, user, text]);
+    return rows[0];
 }
 
 export async function getCommentsPost(post){
