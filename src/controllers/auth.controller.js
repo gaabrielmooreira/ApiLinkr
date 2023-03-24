@@ -38,8 +38,8 @@ export async function signOut(req, res) {
     const id = res.locals.user
 
     try {
-        deleteSession(id)
-        res.sendStatus(204)
+        await deleteSession(id)
+        return res.sendStatus(204)
     } catch (error) {
         res.status(500).send(error.message)
     }
