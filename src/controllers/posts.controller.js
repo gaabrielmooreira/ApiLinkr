@@ -47,8 +47,6 @@ export async function createPost(req, res) {
     }
 }
 
-
-
 export async function getPosts(req, res) {
     const idUser = res.locals.user;
     try {
@@ -163,16 +161,15 @@ export async function getPostsFromUser(req, res) {
     }
 }
 
-
 export async function createRePost(req, res){
     const idPost = req.body.idPost;
     const idUser = res.locals.user;
 
     try {
-        insertRePost(idPost, idUser)
-        res.sendStatus(201)
+        await insertRePost(idPost, idUser)
+        return res.sendStatus(201)
     } catch (error) {
-        res.status(500).send(error.message)
+        return res.status(500).send(error.message)
     }
 }
 
@@ -181,50 +178,20 @@ export async function getRePostCount(req, res){
 
     try {
         const count = await getRePostCountFromDb(idPost)
-        res.send(count.rows[0].count)
+        return res.send(count.rows[0].count)
     } catch (error) {
-        res.status(500).send(error.message)
+        return res.status(500).send(error.message)
     }
 }
-
-// export async function getNewPosts(req, res){
-//     const dateParam = Number(req.params.dateParam) / 1000;
-//     const idUser = res.locals.user;
-
-//     try{
-//         const posts = await getPostsAfterDate(idUser, dateParam);
-//         return res.send(posts.rows);
-//     } catch (err) {
-//         return res.status(500).send(err.message);
-//     }
-// }
-
-
-// export async function getPostAndRePost(req, res){
-//     const idUser = res.locals.user;
-
-//     try {
-//         const posts = await getPostsFromDb(idUser);
-//         const rePosts = await getRePostsFromDb(idUser)
-
-//         const combinate = [...posts.rows, ...rePosts.rows]
-//         combinate.sort((a,b)=> b.created_at - a.created_at)
-
-//         res.send(combinate)
-        
-//     } catch (error) {
-//         res.status(500).send(error.message)
-//     }
-// }
 
 export async function getRePostsAndPosts(req,res){
     const idUser = res.locals.user;
     try{
         const rePostsAndPosts = await getRePostsAndPostsFromDb(idUser);
         
-        res.send(rePostsAndPosts.rows);
+        return res.send(rePostsAndPosts.rows);
     } catch (error) {
-        res.status(500).send(error.message);
+        return res.status(500).send(error.message);
     }
 }
 
