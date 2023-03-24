@@ -19,7 +19,7 @@ export async function signIn(req, res) {
         if (bcrypt.compareSync(password, findedPassword)) {
 
             const token = uuid()
-            startSession(token, id)
+            await startSession(token, id)
 
             return res.status(200).send({ token: token, url: url, name: name, id: id })
 
