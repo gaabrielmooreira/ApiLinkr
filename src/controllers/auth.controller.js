@@ -19,7 +19,7 @@ export async function signIn(req, res) {
         if (bcrypt.compareSync(password, findedPassword)) {
 
             const token = uuid()
-            startSession(token, id)
+            await startSession(token, id)
 
             return res.status(200).send({ token: token, url: url, name: name, id: id })
 
@@ -38,8 +38,8 @@ export async function signOut(req, res) {
     const id = res.locals.user
 
     try {
-        deleteSession(id)
-        res.sendStatus(204)
+        await deleteSession(id)
+        return res.sendStatus(204)
     } catch (error) {
         res.status(500).send(error.message)
     }
