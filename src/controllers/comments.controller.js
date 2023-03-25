@@ -15,11 +15,11 @@ export async function createComment(req, res){
 }
 
  export async function getComments(req, res){
-
     const {post} = req.params;
+    const idUser = res.locals.user;
     
     try {
-        const allComments = await getCommentsPost(post);
+        const allComments = await getCommentsPost(post, idUser);
         return res.status(200).send(allComments);
         
     } catch (error) {
