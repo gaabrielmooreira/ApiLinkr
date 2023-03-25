@@ -5,6 +5,6 @@ import { createComment, getComments } from "../controllers/comments.controller.j
 const commentsRouter = Router();
 
 commentsRouter.post("/create-comment", authValidate, createComment);
-commentsRouter.get("/get-comments/:post", getComments);
+commentsRouter.get("/get-comments/:post", authValidate, getComments);
 
 export default commentsRouter;

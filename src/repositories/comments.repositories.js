@@ -5,12 +5,16 @@ export async function insertComment(post, user, text) {
     return rows[0];
 }
 
-export async function getCommentsPost(post){
+export async function getCommentsPost(idPost, idUser){
     const {rows} = await db.query(`
-    SELECT comments.comment_text, users.name, users.id AS id_comment_author, users.url AS photo, posts.user_id AS id_post_author 
+    SELECT comments.comment_text, users.name, users.url AS photo,
+	(users.id = posts.user_id) as is_author, 
+    COALESCE(follows.follower_user_id = $2,false) as is_following
     FROM comments 
     JOIN users ON comments.user_id = users.id
     JOIN posts ON comments.post_id = posts.id
-    WHERE comments.post_id = $1 ORDER BY comments.created_at ASC;`, [post]);
+    LEFT JOIN follows on comments.user_id = follows.followed_user_id and follows.follower_user_id = $2
+    WHERE comments.post_id = $1 ORDER BY comments.created_at ASC;    
+    `, [idPost, idUser]);
     return rows;
 }
