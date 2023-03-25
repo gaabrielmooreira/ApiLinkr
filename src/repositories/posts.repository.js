@@ -184,8 +184,8 @@ export async function getRePostsAndPostsAfterDateFromDb(idUser, date) {
         JOIN users u2
             ON u2.id = posts.user_id
         LEFT JOIN follows 
-            ON follows.followed_user_id = posts.user_id
-        WHERE posts.created_at > to_timestamp($2) AND posts.user_id != $1 AND follows.follower_user_id = $1
+            ON follows.followed_user_id = posts.user_id AND follows.follower_user_id = $1
+        WHERE posts.created_at > to_timestamp($2) AND posts.user_id != $1
         GROUP BY posts.id, u2.id, follows.follower_user_id
         UNION ALL
         SELECT 
@@ -226,8 +226,8 @@ export async function getRePostsAndPostsAfterDateFromDb(idUser, date) {
         JOIN users u3 
             ON u3.id = re_posts.user_id
         LEFT JOIN follows
-            ON follows.followed_user_id = re_posts.user_id
-        WHERE re_posts.created_at > to_timestamp($2) AND re_posts.user_id != $1 AND follows.follower_user_id = $1
+            ON follows.followed_user_id = re_posts.user_id AND follows.follower_user_id = $1
+        WHERE re_posts.created_at > to_timestamp($2) AND re_posts.user_id != $1
         GROUP BY re_posts.id, posts.id, u2.id,u3.id, follows.follower_user_id
         ) AS combination
     ORDER BY created_at DESC;
@@ -271,7 +271,7 @@ export async function getRePostsAndPostsFromDb(idUser) {
         JOIN users u2
             ON u2.id = posts.user_id
         LEFT JOIN follows 
-            ON follows.followed_user_id = posts.user_id
+            ON follows.followed_user_id = posts.user_id AND follows.follower_user_id = $1
         WHERE follows.follower_user_id = $1 OR posts.user_id = $1
         GROUP BY posts.id, u2.id, follows.follower_user_id
         UNION ALL
@@ -313,7 +313,7 @@ export async function getRePostsAndPostsFromDb(idUser) {
         JOIN users u3 
             ON u3.id = re_posts.user_id
         LEFT JOIN follows 
-            ON follows.followed_user_id = re_posts.user_id
+            ON follows.followed_user_id = re_posts.user_id AND follows.follower_user_id = $1
         WHERE follows.follower_user_id = $1 OR re_posts.user_id = $1
         GROUP BY re_posts.id, posts.id, u2.id,u3.id, follows.follower_user_id
         ) AS combination
