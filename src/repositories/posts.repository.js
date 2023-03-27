@@ -76,7 +76,7 @@ export async function getRepositoryPostsByHashtag(hashtag, idUser) {
                 FROM likes
                 JOIN users ON likes.user_id = users.id
                 WHERE likes.post_id = posts.id AND likes.user_id != $2
-                ORDER BY likes.created_at DESC
+                ORDER BY likes.created_at ASC
                 LIMIT 2
             ) subquery
         ) AS liked_by,
@@ -119,7 +119,7 @@ export async function getPostsByUser(idUser, id) {
                 FROM likes
                 JOIN users ON likes.user_id = users.id
                 WHERE likes.post_id = posts.id AND likes.user_id != $1
-                ORDER BY likes.created_at DESC
+                ORDER BY likes.created_at ASC
                 LIMIT 2
             ) subquery
         ) AS liked_by,
@@ -169,7 +169,7 @@ export async function getRePostsAndPostsAfterDateFromDb(idUser, date) {
                     FROM likes
                     JOIN users ON likes.user_id = users.id
                     WHERE likes.post_id = posts.id AND likes.user_id != $1
-                    ORDER BY likes.created_at DESC
+                    ORDER BY likes.created_at ASC
                     LIMIT 2
                 ) subquery
             ) AS liked_by,
@@ -207,7 +207,7 @@ export async function getRePostsAndPostsAfterDateFromDb(idUser, date) {
                     FROM likes
                     JOIN users ON likes.user_id = users.id
                     WHERE likes.post_id = posts.id AND likes.user_id != $1
-                    ORDER BY likes.created_at DESC
+                    ORDER BY likes.created_at ASC
                     LIMIT 2
                 ) subquery
             ) AS liked_by,
@@ -256,7 +256,7 @@ export async function getRePostsAndPostsFromDb(idUser) {
                     FROM likes
                     JOIN users ON likes.user_id = users.id 
                     WHERE likes.post_id = posts.id AND likes.user_id != $1
-                    ORDER BY likes.created_at DESC
+                    ORDER BY likes.created_at ASC
                     LIMIT 2
                 ) subquery
             ) AS liked_by,
@@ -294,7 +294,7 @@ export async function getRePostsAndPostsFromDb(idUser) {
                     FROM likes
                     JOIN users ON likes.user_id = users.id
                     WHERE likes.post_id = posts.id AND likes.user_id != $1
-                    ORDER BY likes.created_at DESC
+                    ORDER BY likes.created_at ASC
                     LIMIT 2
                 ) subquery
             ) AS liked_by,
